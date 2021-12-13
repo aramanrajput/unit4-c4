@@ -40,6 +40,33 @@ try{
 const login = (req,res)=>{
 
    
+try{
+    let user = await User.findOne({email: req.body.email}).lean().exec()
+
+    if(!user){return res.status(400).json({
+        status:"failed",
+        message:"Please provide a correct email adress or password"
+    })}
+
+    
+      const match = await user.checkPassword(req.body.password)
+
+    if(!match){
+        return res.status(400).json({
+            status:"failed",
+            message:"Please provide correct email or password"
+        })
+    }
+
+    const token = newToken(user)
+
+    res.status(201).json({user,token})
+
+
+}catch(e){
+    return res.status(500).json({status:"failed", message:e.message})
+}
+
 
 }
 
